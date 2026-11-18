@@ -1,4 +1,4 @@
-.PHONY: build install format-check format lint lint-fix mypy test test-all
+.PHONY: build install ruff-cs-check ruff-cs-fix ruff-linter-check ruff-linter-fix mypy-check test test-all
 
 # Сборка Docker-образа.
 build:
@@ -6,30 +6,32 @@ build:
 
 # Тесты: корень лекции (пакет bot) и tests/ (модуль mock) в PYTHONPATH.
 test:
-	PYTHONPATH=.:tests uv run python tests/test_long_polling.py
-	PYTHONPATH=.:tests uv run python tests/test_message_text.py
+	@for f in tests/test_*.py; do \
+		PYTHONPATH=.:tests uv run python "$$f" || exit 1; \
+	done
 
-# Все проверки без автофиксов: format-check, lint, mypy, test.
-test-all: format-check lint mypy test
+
+# Все проверки без автофиксов: ruff-cs-check, ruff-linter-check, mypy-check, test.
+test-all: ruff-cs-check ruff-linter-check mypy-check test
 
 # Dev-зависимости (ruff, mypy) в .venv через uv.
 install:
 	uv sync --group dev
 
 # Код стайл: проверка / автоисправление (ruff format).
-format-check:
+ruff-cs-check:
 	uv run ruff format --check .
 
-format:
+ruff-cs-fix:
 	uv run ruff format .
 
 # Линтер: проверка / автоисправление (ruff check).
-lint:
+ruff-linter-check:
 	uv run ruff check .
 
-lint-fix:
+ruff-linter-fix:
 	uv run ruff check --fix .
 
 # Проверка типов.
-mypy:
+mypy-check:
 	uv run mypy bot
