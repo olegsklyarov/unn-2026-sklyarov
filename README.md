@@ -32,15 +32,17 @@ flowchart LR
 | Переменная          | Обязательная | Описание                                                        |
 |---------------------|--------------|-----------------------------------------------------------------|
 | `TELEGRAM_TOKEN`    | да           | Токен бота, выдаёт [@BotFather](https://t.me/BotFather)         |
-| `TELEGRAM_BASE_URL` | нет          | Адрес Bot API, по умолчанию `https://api.telegram.org`          |
+| `TELEGRAM_BASE_URL` | да           | Адрес Bot API, например `https://api.telegram.org`              |
 
 ## Запуск
 
 Нужен [uv](https://docs.astral.sh/uv/).
 
 ```sh
-make install                                   # установить dev-зависимости (ruff, mypy)
-TELEGRAM_TOKEN=<токен> uv run python -m bot    # запустить бота
+make install   # установить dev-зависимости (ruff, mypy)
+
+# запустить бота
+TELEGRAM_TOKEN=<токен> TELEGRAM_BASE_URL=https://api.telegram.org uv run python -m bot
 ```
 
 Остановка — `Ctrl+C`.
@@ -57,5 +59,8 @@ make ruff-cs-fix ruff-linter-fix   # автоисправление стиля �
 
 ```sh
 make build
-docker run --rm -e TELEGRAM_TOKEN=<токен> unn-2026-sklyarov-bot-test
+docker run --rm \
+    -e TELEGRAM_TOKEN=<токен> \
+    -e TELEGRAM_BASE_URL=https://api.telegram.org \
+    unn-2026-sklyarov-bot-test
 ```

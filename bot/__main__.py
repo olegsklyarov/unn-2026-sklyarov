@@ -14,7 +14,7 @@ def main() -> None:
 
     messenger = TelegramMessenger(
         token=os.environ["TELEGRAM_TOKEN"],
-        base_url=os.environ.get("TELEGRAM_BASE_URL", "https://api.telegram.org"),
+        base_url=os.environ["TELEGRAM_BASE_URL"],
     )
     dispatcher = Dispatcher(messenger)
     dispatcher.add_handlers(*get_handlers())
