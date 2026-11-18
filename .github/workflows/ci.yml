@@ -7,8 +7,37 @@ on:
     branches: [master]
 
 jobs:
+  quality:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Ruff format
+        run: make format-check
+
+      - name: Ruff check
+        run: make lint
+
+      - name: Mypy
+        run: make mypy
+
+      - name: Tests
+        run: make test
+
   check:
     runs-on: ubuntu-26.04
+    needs: quality
     steps:
       - uses: actions/checkout@v7
 
