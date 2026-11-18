@@ -10,3 +10,7 @@ class Messenger(ABC):
     @abstractmethod
     def send_message(self, **params: object) -> dict[str, Any]:
         pass
+
+    @abstractmethod
+    def send_sticker(self, **params: object) -> dict[str, Any]:
+        pass

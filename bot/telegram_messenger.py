@@ -19,6 +19,9 @@ class TelegramMessenger(Messenger):
     def send_message(self, **params: object) -> dict[str, Any]:
         return self._request("sendMessage", params)
 
+    def send_sticker(self, **params: object) -> dict[str, Any]:
+        return self._request("sendSticker", params)
+
     def _request(self, method: str, params: dict[str, object]) -> dict[str, Any]:
         request = urllib.request.Request(
             f"{self._url}/{method}",

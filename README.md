@@ -1,6 +1,6 @@
 # unn-2026-sklyarov-test
 
-Учебный эхо-бот для Telegram: отвечает пользователю тем же текстом, который получил.
+Учебный эхо-бот для Telegram: отвечает пользователю тем же текстом или стикером, который получил.
 Написан на чистом Python без runtime-зависимостей — HTTP-запросы к Telegram Bot API
 делаются через стандартный `urllib`.
 
@@ -15,17 +15,19 @@ flowchart LR
     poll_once -->|"get_updates"| TelegramMessenger
     poll_once -->|"dispatch(update)"| Dispatcher
     Dispatcher -->|"can_handle / handle"| Handler
-    Handler -->|"send_message"| TelegramMessenger
+    Handler -->|"send_message / send_sticker"| TelegramMessenger
 ```
 
-- `bot/messenger.py` — абстрактный интерфейс `Messenger`: получить обновления и отправить сообщение.
+- `bot/messenger.py` — абстрактный интерфейс `Messenger`: получить обновления, отправить сообщение или стикер.
 - `bot/telegram_messenger.py` — реализация `Messenger` для Telegram Bot API.
 - `bot/long_polling.py` — цикл long polling: `poll_once` запрашивает обновления,
   сдвигает `offset` и передаёт каждое обновление в `Dispatcher`.
 - `bot/dispatcher.py` — паттерн «Цепочка обязанностей» (Chain of Responsibility):
   обновление проходит по обработчикам, пока один из них не вернёт `HandlerStatus.STOP`.
 - `bot/handlers/` — обработчики. Новый обработчик наследуется от `Handler`
-  и регистрируется в `get_handlers()` в `bot/handlers/__init__.py`.
+  и регистрируется в `get_handlers()` в `bot/handlers/__init__.py`:
+  - `message_text.py` — эхо текстового сообщения;
+  - `message_sticker.py` — эхо стикера.
 
 ## Переменные окружения
 
