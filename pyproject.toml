@@ -10,11 +10,19 @@ dev = [
     "mypy",
 ]
 
-[tool.ruff.lint.per-file-ignores]
-# Учебный Mock в tests/mock.py, не unittest.mock.
-"tests/**" = ["UP026"]
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle: базовые ошибки стиля
+    "F",   # pyflakes: неиспользуемые импорты и переменные, неопределённые имена
+    "I",   # isort: порядок импортов
+    "UP",  # pyupgrade: современный синтаксис Python
+    "B",   # flake8-bugbear: типичные ошибки и подозрительные конструкции
+    "SIM", # flake8-simplify: код, который можно записать проще
+    "ARG", # flake8-unused-arguments: неиспользуемые аргументы функций
+]
 
 [tool.mypy]
 python_version = "3.14"
+strict = true
 explicit_package_bases = true
 packages = ["bot"]
