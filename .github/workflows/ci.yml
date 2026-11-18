@@ -7,40 +7,56 @@ on:
     branches: [master]
 
 jobs:
-  check:
+  quality:
     runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
 
-      - name: Run make build
-        run: make build
+      - name: Install uv
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
 
-  docker-publish:
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Ruff cs check
+        run: make ruff-cs-check
+
+      - name: Ruff linter check
+        run: make ruff-linter-check
+
+      - name: Mypy check
+        run: make mypy-check
+
+
+      - name: Tests
+        run: make test
+
+  docker:
     runs-on: ubuntu-26.04
-    if: github.event_name == 'push'
-    needs: check
+    needs: quality
     permissions:
       contents: read
       packages: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
 
       - name: Log in to GHCR
+        if: github.event_name == 'push'
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build docker image
         uses: docker/build-push-action@v7
         with:
           context: .
           platforms: linux/amd64
-          push: true
-          build-args: |
-            VCS_REF=${{ github.sha }}
+          push: ${{ github.event_name == 'push' }}
           tags: |
             ghcr.io/olegsklyarov/unn-2026-sklyarov-test:latest
             ghcr.io/olegsklyarov/unn-2026-sklyarov-test:${{ github.sha }}
