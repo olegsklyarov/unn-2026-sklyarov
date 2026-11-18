@@ -1,63 +1,53 @@
-from mock import Mock
+import unittest
+
+from fake import Fake
 
 from bot.handlers.handler import HandlerStatus
 from bot.handlers.message_text import MessageTextHandler
 from bot.messenger import Messenger
 
 
-def test_can_handle_message_with_text():
-    update = {
-        "update_id": 1,
-        "message": {
-            "message_id": 1,
-            "chat": {"id": 42, "type": "private"},
-            "text": "Hello world",
-        },
-    }
-    messenger: Messenger = Mock({})
-    handler = MessageTextHandler()
+class MessageTextHandlerTest(unittest.TestCase):
+    def test_can_handle_message_with_text(self) -> None:
+        update = {
+            "update_id": 1,
+            "message": {
+                "message_id": 1,
+                "chat": {"id": 42, "type": "private"},
+                "text": "Hello world",
+            },
+        }
 
-    assert handler.can_handle(update, messenger) is True
+        self.assertTrue(MessageTextHandler().can_handle(update))
 
+    def test_can_handle_rejects_update_without_text(self) -> None:
+        update = {
+            "update_id": 1,
+            "message": {
+                "message_id": 1,
+                "chat": {"id": 42, "type": "private"},
+            },
+        }
 
-def test_can_handle_rejects_update_without_text():
-    update = {
-        "update_id": 1,
-        "message": {
-            "message_id": 1,
-            "chat": {"id": 42, "type": "private"},
-        },
-    }
-    messenger: Messenger = Mock({})
-    handler = MessageTextHandler()
+        self.assertFalse(MessageTextHandler().can_handle(update))
 
-    assert handler.can_handle(update, messenger) is False
+    def test_handle_echoes_text_and_stops(self) -> None:
+        update = {
+            "update_id": 1,
+            "message": {
+                "message_id": 1,
+                "chat": {"id": 42, "type": "private"},
+                "text": "Hello world",
+            },
+        }
+        sent = []
 
+        def fake_send_message(**params):
+            sent.append(params)
 
-def test_handle_echoes_text_and_stops():
-    update = {
-        "update_id": 1,
-        "message": {
-            "message_id": 1,
-            "chat": {"id": 42, "type": "private"},
-            "text": "Hello world",
-        },
-    }
-    sent = []
+        messenger: Messenger = Fake({"send_message": fake_send_message})
 
-    def mock_send_message(**params):
-        sent.append(params)
+        status = MessageTextHandler().handle(update, messenger)
 
-    messenger: Messenger = Mock({"send_message": mock_send_message})
-    handler = MessageTextHandler()
-
-    status = handler.handle(update, messenger)
-
-    assert status == HandlerStatus.STOP
-    assert sent == [{"chat_id": 42, "text": "Hello world"}]
-
-
-if __name__ == "__main__":
-    test_can_handle_message_with_text()
-    test_can_handle_rejects_update_without_text()
-    test_handle_echoes_text_and_stops()
+        self.assertEqual(status, HandlerStatus.STOP)
+        self.assertEqual(sent, [{"chat_id": 42, "text": "Hello world"}])
