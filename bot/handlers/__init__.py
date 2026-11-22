@@ -1,10 +1,17 @@
+from bot.clock import Clock
+from bot.handlers.ensure_user import EnsureUserHandler
 from bot.handlers.handler import Handler
-from bot.handlers.message_sticker import MessageStickerHandler
-from bot.handlers.message_text import MessageTextHandler
+from bot.handlers.pizza_drink import PizzaDrinkHandler
+from bot.handlers.pizza_size import PizzaSizeHandler
+from bot.handlers.pizza_type import PizzaTypeHandler
+from bot.handlers.update_logger import UpdateLoggerHandler
 
 
-def get_handlers() -> list[Handler]:
+def get_handlers(clock: Clock) -> list[Handler]:
     return [
-        MessageTextHandler(),
-        MessageStickerHandler(),
+        UpdateLoggerHandler(clock),
+        EnsureUserHandler(clock),
+        PizzaTypeHandler(clock),
+        PizzaSizeHandler(clock),
+        PizzaDrinkHandler(clock),
     ]

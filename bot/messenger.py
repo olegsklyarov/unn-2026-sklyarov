@@ -14,3 +14,7 @@ class Messenger(ABC):
     @abstractmethod
     def send_sticker(self, **params: object) -> dict[str, Any]:
         pass
+
+    @abstractmethod
+    def answer_callback_query(self, **params: object) -> dict[str, Any]:
+        pass

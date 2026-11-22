@@ -3,6 +3,7 @@ from enum import Enum, auto
 from typing import Any
 
 from bot.messenger import Messenger
+from bot.storage import Storage
 
 
 class HandlerStatus(Enum):
@@ -12,9 +13,15 @@ class HandlerStatus(Enum):
 
 class Handler(ABC):
     @abstractmethod
-    def can_handle(self, update: dict[str, Any]) -> bool:
+    def can_handle(self, update: dict[str, Any], state: str | None) -> bool:
         pass
 
     @abstractmethod
-    def handle(self, update: dict[str, Any], messenger: Messenger) -> HandlerStatus:
+    def handle(
+        self,
+        update: dict[str, Any],
+        state: str | None,
+        messenger: Messenger,
+        storage: Storage,
+    ) -> HandlerStatus:
         pass

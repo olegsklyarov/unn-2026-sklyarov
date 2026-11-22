@@ -31,7 +31,14 @@ class PollOnceTest(unittest.TestCase):
 
         self.assertEqual(
             requested,
-            [{"offset": 0, "limit": 10, "timeout": 30, "allowed_updates": ["message"]}],
+            [
+                {
+                    "offset": 0,
+                    "limit": 10,
+                    "timeout": 30,
+                    "allowed_updates": ["message", "callback_query"],
+                }
+            ],
         )
         self.assertEqual(dispatched, [update])
         self.assertEqual(next_offset, 2027)

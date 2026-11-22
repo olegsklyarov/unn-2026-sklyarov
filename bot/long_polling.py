@@ -14,7 +14,7 @@ def poll_once(dispatcher: Dispatcher, messenger: Messenger, offset: int) -> int:
         offset=offset,
         limit=10,
         timeout=30,
-        allowed_updates=["message"],
+        allowed_updates=["message", "callback_query"],
     )
     for update in updates:
         offset = max(offset, update["update_id"] + 1)
