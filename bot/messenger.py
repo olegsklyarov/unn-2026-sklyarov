@@ -18,3 +18,7 @@ class Messenger(ABC):
     @abstractmethod
     def answer_callback_query(self, **params: object) -> dict[str, Any]:
         pass
+
+    @abstractmethod
+    def delete_message(self, **params: object) -> dict[str, Any]:
+        pass

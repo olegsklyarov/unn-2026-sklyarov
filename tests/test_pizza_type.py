@@ -97,11 +97,13 @@ class PizzaTypeHandlerTest(unittest.TestCase):
     def test_pizza_callback_advances_to_size(self) -> None:
         sent: list[dict[str, Any]] = []
         answered: list[dict[str, Any]] = []
+        deleted: list[dict[str, Any]] = []
         saved: list[dict[str, Any]] = []
         messenger: Messenger = Fake(
             {
                 "send_message": lambda **kwargs: sent.append(kwargs),
                 "answer_callback_query": lambda **kwargs: answered.append(kwargs),
+                "delete_message": lambda **kwargs: deleted.append(kwargs),
             }
         )
         storage: Storage = Fake({"save_order": lambda **kwargs: saved.append(kwargs)})
@@ -127,6 +129,7 @@ class PizzaTypeHandlerTest(unittest.TestCase):
             _column(sent[0], "callback_data"), ["small", "medium", "large"]
         )
         self.assertEqual(answered, [{"callback_query_id": "cb-1"}])
+        self.assertEqual(deleted, [{"chat_id": 99, "message_id": 1}])
 
     def test_unknown_callback_repeats_pizza_menu(self) -> None:
         sent: list[dict[str, Any]] = []
@@ -135,6 +138,7 @@ class PizzaTypeHandlerTest(unittest.TestCase):
             {
                 "send_message": lambda **kwargs: sent.append(kwargs),
                 "answer_callback_query": lambda **_kwargs: None,
+                "delete_message": lambda **_kwargs: None,
             }
         )
         storage: Storage = Fake({"save_order": lambda **kwargs: saved.append(kwargs)})
@@ -153,6 +157,7 @@ class PizzaTypeHandlerTest(unittest.TestCase):
             {
                 "send_message": lambda **kwargs: sent.append(kwargs),
                 "answer_callback_query": lambda **_kwargs: None,
+                "delete_message": lambda **_kwargs: None,
             }
         )
         storage: Storage = Fake({"save_order": lambda **kwargs: saved.append(kwargs)})

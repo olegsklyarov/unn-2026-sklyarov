@@ -39,6 +39,19 @@ def chat_id(update: dict[str, Any]) -> int | None:
     return None
 
 
+def callback_message_id(update: dict[str, Any]) -> int | None:
+    callback = update.get("callback_query")
+    if not isinstance(callback, dict):
+        return None
+    message = callback.get("message")
+    if not isinstance(message, dict):
+        return None
+    value = message.get("message_id")
+    if isinstance(value, int):
+        return value
+    return None
+
+
 def callback_query_id(update: dict[str, Any]) -> str | None:
     callback = update.get("callback_query")
     if not isinstance(callback, dict):

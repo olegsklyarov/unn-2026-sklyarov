@@ -67,10 +67,12 @@ class DispatcherOrderTest(unittest.TestCase):
         self.path = os.path.join(self._tmp.name, "database.sqlite")
         self.sent: list[dict[str, Any]] = []
         self.answered: list[dict[str, Any]] = []
+        self.deleted: list[dict[str, Any]] = []
         messenger: Messenger = Fake(
             {
                 "send_message": lambda **kwargs: self.sent.append(kwargs),
                 "answer_callback_query": lambda **kwargs: self.answered.append(kwargs),
+                "delete_message": lambda **kwargs: self.deleted.append(kwargs),
             }
         )
         self.storage = SqliteStorage(self.path, MIGRATIONS)
@@ -143,6 +145,14 @@ class DispatcherOrderTest(unittest.TestCase):
                 {"callback_query_id": "cb-2"},
                 {"callback_query_id": "cb-3"},
                 {"callback_query_id": "cb-4"},
+            ],
+        )
+        self.assertEqual(
+            self.deleted,
+            [
+                {"chat_id": 7, "message_id": 1},
+                {"chat_id": 7, "message_id": 1},
+                {"chat_id": 7, "message_id": 1},
             ],
         )
         with sqlite3.connect(self.path) as connection:

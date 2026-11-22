@@ -73,11 +73,13 @@ class PizzaSizeHandlerTest(unittest.TestCase):
     def test_size_callback_keeps_pizza_and_asks_for_drink(self) -> None:
         sent: list[dict[str, Any]] = []
         answered: list[dict[str, Any]] = []
+        deleted: list[dict[str, Any]] = []
         saved: list[dict[str, Any]] = []
         messenger: Messenger = Fake(
             {
                 "send_message": lambda **kwargs: sent.append(kwargs),
                 "answer_callback_query": lambda **kwargs: answered.append(kwargs),
+                "delete_message": lambda **kwargs: deleted.append(kwargs),
             }
         )
         storage: Storage = Fake(
@@ -114,6 +116,7 @@ class PizzaSizeHandlerTest(unittest.TestCase):
             ["Сок", "Морс", "Чай", "Кола", "Без напитка"],
         )
         self.assertEqual(answered, [{"callback_query_id": "cb-2"}])
+        self.assertEqual(deleted, [{"chat_id": 99, "message_id": 1}])
 
     def test_text_repeats_size_menu(self) -> None:
         sent: list[dict[str, Any]] = []

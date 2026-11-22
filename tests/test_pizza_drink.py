@@ -64,11 +64,13 @@ class PizzaDrinkHandlerTest(unittest.TestCase):
     def test_drink_callback_finishes_order(self) -> None:
         sent: list[dict[str, Any]] = []
         answered: list[dict[str, Any]] = []
+        deleted: list[dict[str, Any]] = []
         saved: list[dict[str, Any]] = []
         messenger: Messenger = Fake(
             {
                 "send_message": lambda **kwargs: sent.append(kwargs),
                 "answer_callback_query": lambda **kwargs: answered.append(kwargs),
+                "delete_message": lambda **kwargs: deleted.append(kwargs),
             }
         )
         storage: Storage = Fake(
@@ -100,6 +102,7 @@ class PizzaDrinkHandlerTest(unittest.TestCase):
         )
         self.assertNotIn("reply_markup", sent[0])
         self.assertEqual(answered, [{"callback_query_id": "cb-3"}])
+        self.assertEqual(deleted, [{"chat_id": 99, "message_id": 1}])
 
     def test_no_drink_is_stored(self) -> None:
         sent: list[dict[str, Any]] = []
@@ -108,6 +111,7 @@ class PizzaDrinkHandlerTest(unittest.TestCase):
             {
                 "send_message": lambda **kwargs: sent.append(kwargs),
                 "answer_callback_query": lambda **_kwargs: None,
+                "delete_message": lambda **_kwargs: None,
             }
         )
         storage: Storage = Fake(

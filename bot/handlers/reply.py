@@ -3,7 +3,7 @@ from typing import Any
 from bot.catalog import inline_keyboard
 from bot.messenger import Messenger
 from bot.storage import Storage
-from bot.telegram_update import callback_query_id
+from bot.telegram_update import callback_message_id, callback_query_id, chat_id
 
 
 def send_menu(
@@ -17,6 +17,14 @@ def send_menu(
         text=text,
         reply_markup=inline_keyboard(options),
     )
+
+
+def drop_keyboard(update: dict[str, Any], messenger: Messenger) -> None:
+    message_id = callback_message_id(update)
+    target_chat = chat_id(update)
+    if message_id is None or target_chat is None:
+        return
+    messenger.delete_message(chat_id=target_chat, message_id=message_id)
 
 
 def acknowledge(update: dict[str, Any], messenger: Messenger) -> None:

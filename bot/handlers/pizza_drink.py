@@ -10,7 +10,7 @@ from bot.catalog import (
 )
 from bot.clock import Clock
 from bot.handlers.handler import Handler, HandlerStatus
-from bot.handlers.reply import acknowledge, remembered_order, send_menu
+from bot.handlers.reply import acknowledge, drop_keyboard, remembered_order, send_menu
 from bot.messenger import Messenger
 from bot.storage import Storage
 from bot.telegram_update import callback_data, chat_id, telegram_user, telegram_user_id
@@ -34,6 +34,7 @@ class PizzaDrinkHandler(Handler):
         target_chat = chat_id(update)
         if user_id is None or target_chat is None:
             return HandlerStatus.STOP
+        drop_keyboard(update, messenger)
         selected = choice(DRINKS, callback_data(update))
         if selected is not None:
             order = remembered_order(storage, user_id)

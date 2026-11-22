@@ -25,6 +25,9 @@ class TelegramMessenger(Messenger):
     def answer_callback_query(self, **params: object) -> dict[str, Any]:
         return self._request("answerCallbackQuery", params)
 
+    def delete_message(self, **params: object) -> dict[str, Any]:
+        return self._request("deleteMessage", params)
+
     def _request(self, method: str, params: dict[str, object]) -> dict[str, Any]:
         request = urllib.request.Request(
             f"{self._url}/{method}",
