@@ -23,8 +23,11 @@ class PizzaTypeHandler(Handler):
         self._clock = clock
 
     def can_handle(self, update: dict[str, Any], state: str | None) -> bool:
-        tracked = state in {None, WAITING_FOR_PIZZA_TYPE, FINISHED}
-        return tracked and telegram_user(update) is not None
+        if telegram_user(update) is None:
+            return False
+        if _message_text(update) == "/start":
+            return True
+        return state in {None, WAITING_FOR_PIZZA_TYPE, FINISHED}
 
     def handle(
         self,
@@ -38,7 +41,7 @@ class PizzaTypeHandler(Handler):
         if user_id is None or target_chat is None:
             return HandlerStatus.STOP
         drop_keyboard(update, messenger)
-        if state == FINISHED:
+        if _message_text(update) == "/start" or state == FINISHED:
             storage.save_order(
                 telegram_user_id=user_id,
                 state=WAITING_FOR_PIZZA_TYPE,
@@ -62,3 +65,13 @@ class PizzaTypeHandler(Handler):
         send_menu(messenger, target_chat, PIZZA_PROMPT, PIZZAS)
         acknowledge(update, messenger)
         return HandlerStatus.STOP
+
+
+def _message_text(update: dict[str, Any]) -> str | None:
+    message = update.get("message")
+    if not isinstance(message, dict):
+        return None
+    text = message.get("text")
+    if isinstance(text, str):
+        return text
+    return None

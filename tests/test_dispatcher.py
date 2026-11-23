@@ -161,3 +161,17 @@ class DispatcherOrderTest(unittest.TestCase):
             ).fetchone()
         assert logged is not None
         self.assertEqual(logged[0], 5)
+
+    def test_start_resets_after_pepperoni(self) -> None:
+        self.dispatcher.dispatch(_text(1, "/start"))
+        self.dispatcher.dispatch(_callback(2, "pepperoni"))
+        self.dispatcher.dispatch(_text(3, "/start"))
+        user = self.storage.get_user(7)
+
+        assert user is not None
+        self.assertEqual(user.state, WAITING_FOR_PIZZA_TYPE)
+        self.assertEqual(user.order, {})
+        self.assertEqual(
+            [message["text"] for message in self.sent],
+            ["Выберите пиццу", "Выберите размер", "Выберите пиццу"],
+        )
